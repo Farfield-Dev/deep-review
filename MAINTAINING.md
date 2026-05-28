@@ -21,11 +21,12 @@ This repo IS the skill directory. Cloning into `~/.claude/skills/deep-review/` m
 ```
 deep-review/                      (repo root = skill directory)
 ├── SKILL.md                      Entry point, orchestrator, sub-agent prompts
-├── architecture-map.md           Phase 1 detail (loaded on demand)
-├── team-intent.md                Phase 2 detail (loaded on demand)
-├── action-trace.md               Phase 3 detail (loaded on demand)
-├── product-scan.md               Phase 4 detail (loaded on demand)
-├── adversarial-validate.md       Phase 5 detail (loaded on demand)
+├── phases/                       Phase methodology, loaded on demand from SKILL.md
+│   ├── architecture-map.md       Phase 1
+│   ├── team-intent.md            Phase 2
+│   ├── action-trace.md           Phase 3
+│   ├── product-scan.md           Phase 4
+│   └── adversarial-validate.md   Phase 5
 ├── README.md                     Repo-facing — not loaded by Claude Code
 ├── LICENSE
 ├── MAINTAINING.md                This file
@@ -34,7 +35,7 @@ deep-review/                      (repo root = skill directory)
     └── findings-*.md             Example outputs from running on real OSS repos
 ```
 
-`SKILL.md` is the only file with YAML frontmatter. The phase files are referenced from `SKILL.md` via standard markdown links, so Claude Code loads them on demand when each phase starts.
+`SKILL.md` is the only file with YAML frontmatter. The `phases/*.md` files are referenced from `SKILL.md` via standard markdown links, so Claude Code loads them on demand when each phase starts.
 
 ## Sync workflow
 
@@ -53,17 +54,17 @@ The portable IP lives in five places. If you're updating the recipe, these are t
 
 | File | What lives here |
 |---|---|
-| `architecture-map.md` | Phase 0 signals, action inventory, workflow ledger, impact taxonomy, severity calibration |
-| `team-intent.md` | Bug-class mix taxonomy, anti-circularity (no SHAs / files in the brief), confidence cascade |
-| `action-trace.md` | The 7 trace questions, parallel sub-agent shape, cross-action synthesis |
-| `product-scan.md` | UX/product-level bug heuristics |
-| `adversarial-validate.md` | 100%-confidence rubric, scenario-specific mitigation check, disprove-vs-preserve balance |
+| `phases/architecture-map.md` | Phase 0 signals, action inventory, workflow ledger, impact taxonomy, severity calibration |
+| `phases/team-intent.md` | Bug-class mix taxonomy, anti-circularity (no SHAs / files in the brief), confidence cascade |
+| `phases/action-trace.md` | The 7 trace questions, parallel sub-agent shape, cross-action synthesis |
+| `phases/product-scan.md` | UX/product-level bug heuristics |
+| `phases/adversarial-validate.md` | 100%-confidence rubric, scenario-specific mitigation check, disprove-vs-preserve balance |
 
 `SKILL.md` is the orchestrator and is structurally separate — it does not own methodology, only flow control and sub-agent prompt templates. Methodology changes should land in the phase files; orchestration changes (model choice per phase, modes, output schema) land in `SKILL.md`.
 
 ## What we deliberately do not port
 
-The Farfield-internal recipe has a `01_context_bootstrap.md` step that maintains a multi-run cache of company-context and per-repo structural maps, synced through the pod artifact endpoint. The OSS review is single-run cold by design, so we collapse that step's useful methodology (clone discovery, company-context inference) into `architecture-map.md` as a prelude and drop the cache machinery.
+The Farfield-internal recipe has a `01_context_bootstrap.md` step that maintains a multi-run cache of company-context and per-repo structural maps, synced through the pod artifact endpoint. The OSS review is single-run cold by design, so we collapse that step's useful methodology (clone discovery, company-context inference) into `phases/architecture-map.md` as a prelude and drop the cache machinery.
 
 If you find yourself porting any of the following from the internal recipe, **stop and reconsider** — they're scaffolding, not methodology:
 

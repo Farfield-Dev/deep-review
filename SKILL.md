@@ -1,6 +1,6 @@
 ---
 name: deep-review
-description: Run a deep, senior-engineer-grade code review on a repository to find real bugs — not style warnings or hypothetical issues. Use when the user says "review this repo", "deep review", "audit the codebase", "find bugs", "/deep-review", or asks for the kind of review that catches the production-only failures that pattern-based scanners miss. Five-phase pipeline: architecture-map (action inventory + workflow ledger) → team-intent (class-level bug brief from 2 months of commits) → action-trace (parallel sub-agents follow every user action end-to-end) → product-scan (UX/product-level bugs) → adversarial-validate (100%-confidence rubric). Produces findings.md with severity + impact-category mapping. Phase detail lives in sibling files (architecture-map.md, team-intent.md, action-trace.md, product-scan.md, adversarial-validate.md). This is the recipe Farfield uses in production at farfield.dev.
+description: Run a deep, senior-engineer-grade code review on a repository to find real bugs — not style warnings or hypothetical issues. Use when the user says "review this repo", "deep review", "audit the codebase", "find bugs", "/deep-review", or asks for the kind of review that catches the production-only failures that pattern-based scanners miss. Five-phase pipeline: architecture-map (action inventory + workflow ledger) → team-intent (class-level bug brief from 2 months of commits) → action-trace (parallel sub-agents follow every user action end-to-end) → product-scan (UX/product-level bugs) → adversarial-validate (100%-confidence rubric). Produces findings.md with severity + impact-category mapping. Phase detail lives in `phases/` (architecture-map.md, team-intent.md, action-trace.md, product-scan.md, adversarial-validate.md). This is the recipe Farfield uses in production at farfield.dev.
 allowed-tools: [Read, Write, Edit, Grep, Bash, WebSearch, Task]
 ---
 
@@ -27,13 +27,13 @@ This is the recipe [Farfield](https://farfield.dev) uses in production. The OSS 
 
 ## Companion files (loaded on demand as phases run)
 
-Each phase has its own reference file in this directory. Read each one when its phase begins — they contain the full methodology and prompts:
+Each phase has its own reference file in the `phases/` directory. Read each one when its phase begins — they contain the full methodology and prompts:
 
-- [`architecture-map.md`](architecture-map.md) — Phase 1. Phase 0 signals (git, deps, linter, runtime grep), company-context inference, feature map, action inventory, workflow ledger, integration map, impact taxonomy, severity calibration.
-- [`team-intent.md`](team-intent.md) — Phase 2. Class-level brief from 2 months of commits. Anti-circularity rules.
-- [`action-trace.md`](action-trace.md) — Phase 3. The 7 trace questions, parallel sub-agent pattern, cross-action synthesis. **The primary bug-finding phase.**
-- [`product-scan.md`](product-scan.md) — Phase 4. UX/product-level bugs.
-- [`adversarial-validate.md`](adversarial-validate.md) — Phase 5. 100%-confidence rubric, scenario-specific mitigation check, writes the final `findings.md`.
+- [`phases/architecture-map.md`](phases/architecture-map.md) — Phase 1. Phase 0 signals (git, deps, linter, runtime grep), company-context inference, feature map, action inventory, workflow ledger, integration map, impact taxonomy, severity calibration.
+- [`phases/team-intent.md`](phases/team-intent.md) — Phase 2. Class-level brief from 2 months of commits. Anti-circularity rules.
+- [`phases/action-trace.md`](phases/action-trace.md) — Phase 3. The 7 trace questions, parallel sub-agent pattern, cross-action synthesis. **The primary bug-finding phase.**
+- [`phases/product-scan.md`](phases/product-scan.md) — Phase 4. UX/product-level bugs.
+- [`phases/adversarial-validate.md`](phases/adversarial-validate.md) — Phase 5. 100%-confidence rubric, scenario-specific mitigation check, writes the final `findings.md`.
 
 ## Setup
 
@@ -59,7 +59,7 @@ If the user invokes without flags, run the full pipeline.
 
 ### Phase 1 — Architecture Map
 
-Read [`architecture-map.md`](architecture-map.md) and follow it completely. It writes `$DEEP_REVIEW_DIR/architecture-map.md`.
+Read [`phases/architecture-map.md`](phases/architecture-map.md) and follow it completely. It writes `$DEEP_REVIEW_DIR/architecture-map.md`.
 
 Output gate: the file exists and contains an Action Inventory with at least 5 actions (or all actions if the repo has fewer than 5). Without this, every downstream phase has nothing to work against.
 
@@ -67,7 +67,7 @@ Model recommendation: Sonnet. Phase 1 is exploration + cataloging, not deep reas
 
 ### Phase 2 — Team Intent
 
-Read [`team-intent.md`](team-intent.md) and follow it completely. It writes `$DEEP_REVIEW_DIR/team-intent.md`.
+Read [`phases/team-intent.md`](phases/team-intent.md) and follow it completely. It writes `$DEEP_REVIEW_DIR/team-intent.md`.
 
 Output gate: the file exists and contains `## Bug-class mix`, `## Mode`, `## Confidence`, and `## Trust-critical surface categories` sections. Empty brief is acceptable if the repo has fewer than 30 signal commits — the brief should explicitly say `confidence: low` in that case.
 
@@ -77,7 +77,7 @@ Skip in `--fast` mode.
 
 ### Phase 3 — Action Trace (the main event)
 
-Read [`action-trace.md`](action-trace.md) and follow it completely. This is where most bugs are found.
+Read [`phases/action-trace.md`](phases/action-trace.md) and follow it completely. This is where most bugs are found.
 
 Phase 3 launches **parallel sub-agents** — one per action in the inventory — via the `Task` tool. Each sub-agent gets:
 
@@ -92,7 +92,7 @@ Model recommendation: Opus for the orchestrator and validation sub-agents. Sonne
 
 ### Phase 4 — Product Scan
 
-Read [`product-scan.md`](product-scan.md) and follow it completely. Parallel pass that finds UX/product-level bugs (broken flows, missing states, wrong data shown, dead-end interactions).
+Read [`phases/product-scan.md`](phases/product-scan.md) and follow it completely. Parallel pass that finds UX/product-level bugs (broken flows, missing states, wrong data shown, dead-end interactions).
 
 Output gate: `$DEEP_REVIEW_DIR/product-scan.md` exists.
 
@@ -102,7 +102,7 @@ Skip in `--fast` mode.
 
 ### Phase 5 — Adversarial Validate
 
-Read [`adversarial-validate.md`](adversarial-validate.md) and follow it completely. This phase merges findings from Phase 3 and Phase 4, adversarially validates each one, and writes the final `./findings.md`.
+Read [`phases/adversarial-validate.md`](phases/adversarial-validate.md) and follow it completely. This phase merges findings from Phase 3 and Phase 4, adversarially validates each one, and writes the final `./findings.md`.
 
 Output gate: `./findings.md` exists in the repo root.
 

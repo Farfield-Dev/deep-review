@@ -63,11 +63,11 @@ One skill (this directory), one entry point (`SKILL.md`), five phase reference f
 | File | Phase | What it does |
 |---|---|---|
 | `SKILL.md` | Orchestrator | Routes the pipeline, embeds sub-agent prompts, defines the output schema |
-| `architecture-map.md` | 1 | Phase 0 signals (git, deps, linter, runtime grep), feature map, action inventory, workflow ledger, integration map, impact taxonomy, severity calibration |
-| `team-intent.md` | 2 | Class-level brief from 2 months of commits — bug-class mix, mode, confidence, trust-critical surfaces |
-| `action-trace.md` | 3 | Trace every user action end-to-end in parallel sub-agents. **The primary bug-finding phase.** |
-| `product-scan.md` | 4 | UX/product-level bugs (parallel pass) |
-| `adversarial-validate.md` | 5 | 100%-confidence validation rubric, writes `findings.md` |
+| `phases/architecture-map.md` | 1 | Phase 0 signals (git, deps, linter, runtime grep), feature map, action inventory, workflow ledger, integration map, impact taxonomy, severity calibration |
+| `phases/team-intent.md` | 2 | Class-level brief from 2 months of commits — bug-class mix, mode, confidence, trust-critical surfaces |
+| `phases/action-trace.md` | 3 | Trace every user action end-to-end in parallel sub-agents. **The primary bug-finding phase.** |
+| `phases/product-scan.md` | 4 | UX/product-level bugs (parallel pass) |
+| `phases/adversarial-validate.md` | 5 | 100%-confidence validation rubric, writes `findings.md` |
 
 ## What this is *not*
 
