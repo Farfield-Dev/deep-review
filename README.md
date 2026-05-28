@@ -69,8 +69,6 @@ One skill (this directory), one entry point (`SKILL.md`), five phase reference f
 | `product-scan.md` | 4 | UX/product-level bugs (parallel pass) |
 | `adversarial-validate.md` | 5 | 100%-confidence validation rubric, writes `findings.md` |
 
-> **🚧 Status (day 0)**: phases 1 and 2 are extracted and ready. Phases 3, 4, and 5 are landing this week. The orchestrator SKILL.md and architecture are stable.
-
 ## What this is *not*
 
 Deep Review is the same recipe Farfield runs in production. But this OSS version intentionally ships **without** the things that make Farfield's paid product compounding:
