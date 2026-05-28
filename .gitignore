@@ -1,6 +1,6 @@
-# The scan's working directory, written into the user's repo when they run /deep-scan.
+# The review's working directory, written into the user's repo when they run /deep-review.
 # Nothing in here is intended to be checked in.
-.deep-scan/
+.deep-review/
 
 # Editor + OS noise
 .DS_Store

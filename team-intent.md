@@ -1,27 +1,23 @@
----
-name: team-intent
-description: Step 2 of Deep Scan. Produces a class-level brief from the last 2 months of commit history — bug-class mix, team focus areas, mode, confidence, and trust-critical surface categories. Steers the deep scan's attention budget. Stays at the class level on purpose (no SHAs, no file paths) to avoid making the scan rediscover what the team already fixed.
-allowed-tools: [Read, Write, Edit, Grep, Bash]
----
+# Phase 2 — Team Intent
 
-# Team Intent
+> Loaded from `SKILL.md` as the second phase of Deep Review. Output: `$DEEP_REVIEW_DIR/team-intent.md` — read by the action-trace phase as a priority signal.
 
-You are analyzing the **team's intent** — what classes of bugs they keep fixing, what areas they care about, where they've been burned. The output is a compact *priority signal* the deep scan uses to decide how to allocate its attention budget.
+You are analyzing the **team's intent** — what classes of bugs they keep fixing, what areas they care about, where they've been burned. The output is a compact *priority signal* the action-trace phase uses to decide how to allocate its attention budget.
 
-**Critical distinction.** Internally you will read commit history, diffs, file churn, and SHAs to ground your analysis. But the **brief you write for the scan must stay at the class level**: bug categories, surface categories, mode, confidence. **Do not emit SHAs, specific file paths, or pre-fix grep patterns in the brief.** They turn the scan into a re-discovery of what the team already fixed (a circular exercise that surfaces already-known bugs). The deep scan has its own action inventory — it does not need you to point it at files.
+**Critical distinction.** Internally you will read commit history, diffs, file churn, and SHAs to ground your analysis. But the **brief you write for the review must stay at the class level**: bug categories, surface categories, mode, confidence. **Do not emit SHAs, specific file paths, or pre-fix grep patterns in the brief.** They turn the review into a re-discovery of what the team already fixed (a circular exercise that surfaces already-known bugs). The action-trace phase has its own action inventory — it does not need you to point it at files.
 
 You are analyzing the last **2 months** (recent signal only). Do NOT install dependencies or run tests.
 
 ## Setup
 
 ```bash
-DEEP_SCAN_DIR="${DEEP_SCAN_DIR:-./.deep-scan}"
-mkdir -p "$DEEP_SCAN_DIR"
+DEEP_REVIEW_DIR="${DEEP_REVIEW_DIR:-./.deep-review}"
+mkdir -p "$DEEP_REVIEW_DIR"
 ```
 
 Read these first if present:
 
-- `$DEEP_SCAN_DIR/architecture-map.md` — action inventory, trust-critical surfaces (from the previous step).
+- `$DEEP_REVIEW_DIR/architecture-map.md` — action inventory, trust-critical surfaces (from the previous step).
 
 ## Repo Discovery
 
@@ -130,7 +126,7 @@ Size the list by the evidence, not a quota. A simple repo might yield 2 categori
 
 ## Output
 
-Write to `$DEEP_SCAN_DIR/team-intent.md`:
+Write to `$DEEP_REVIEW_DIR/team-intent.md`:
 
 ```markdown
 # Team Intent Brief
@@ -163,10 +159,10 @@ One paragraph: dominant bug class, mode, confidence. Plain prose only.
 
 ## Done
 
-When `$DEEP_SCAN_DIR/team-intent.md` is written, this step is done. Output a one-line summary:
+When `$DEEP_REVIEW_DIR/team-intent.md` is written, this step is done. Output a one-line summary:
 
 ```
 Team intent: <mode>, <dominant class> dominates at N%, confidence <level>.
 ```
 
-The deep-scan step reads this brief as a priority signal only — it tells the scan how to allocate attention across the action inventory, not where to look. The action inventory is the attack surface; the brief is the steering.
+The action-trace phase reads this brief as a priority signal only — it tells the review how to allocate attention across the action inventory, not where to look. The action inventory is the attack surface; the brief is the steering.

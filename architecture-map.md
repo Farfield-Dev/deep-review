@@ -1,21 +1,17 @@
----
-name: architecture-map
-description: Step 1 of Deep Scan. Builds a feature map, context profile, action inventory, workflow ledger, and integration map. Drives the entire scan — every other step reads this file. Runs Phase 0 grep/git/audit signals first, then explores the codebase.
-allowed-tools: [Read, Write, Edit, Grep, Bash, WebSearch]
----
+# Phase 1 — Architecture Map
 
-# Architecture Map
+> Loaded from `SKILL.md` as the first phase of Deep Review. Output: `$DEEP_REVIEW_DIR/architecture-map.md` — every later phase reads it.
 
 You are building a feature map, context profile, and action inventory to drive a deep bug hunt across this codebase. This is not a one-pass static review — you are setting up a long-running campaign that must surface failures that only appear under real traffic, degraded dependencies, retries, concurrency, deploy overlap, background reprocessing, and partial outages.
 
 ## Setup
 
 ```bash
-DEEP_SCAN_DIR="${DEEP_SCAN_DIR:-./.deep-scan}"
-mkdir -p "$DEEP_SCAN_DIR"
+DEEP_REVIEW_DIR="${DEEP_REVIEW_DIR:-./.deep-review}"
+mkdir -p "$DEEP_REVIEW_DIR"
 ```
 
-All artifacts in this scan live under `$DEEP_SCAN_DIR`. The next step (team-intent) and the steps after it will read `architecture-map.md` from there.
+All artifacts in this scan live under `$DEEP_REVIEW_DIR`. The next step (team-intent) and the steps after it will read `architecture-map.md` from there.
 
 ## Phase 0: Automated Context Gathering
 
@@ -245,7 +241,7 @@ Cross-reference your inventory against every route handler, webhook receiver, qu
 
 ## Output
 
-Write to `$DEEP_SCAN_DIR/architecture-map.md`:
+Write to `$DEEP_REVIEW_DIR/architecture-map.md`:
 
 ```markdown
 # Codebase Map
@@ -414,7 +410,7 @@ The codebase context (product stage, deployment, traffic patterns, customer sign
 - Record exact dependency versions — needed for CVE research in later steps.
 - Known CVEs from dependency audit are FREE findings — list them all, they require no further analysis.
 - The severity calibration section is essential — it prevents inflation in later steps.
-- The Action Inventory is the most important output. Every action you miss is a blind spot in the deep scan. Be exhaustive.
+- The Action Inventory is the most important output. Every action you miss is a blind spot in the review. Be exhaustive.
 - Flag hot files (high churn) and recently-added files as higher priority.
 - The Critical Workflow Ledger is mandatory. Deep production bugs usually hide in workflows, not single files.
 - Explicitly record retries, idempotency guards, async handoffs, cache invalidation points, replica reads, and deploy/migration boundaries.
@@ -423,10 +419,10 @@ The codebase context (product stage, deployment, traffic patterns, customer sign
 
 ## Done
 
-When `$DEEP_SCAN_DIR/architecture-map.md` is written and reflects the full feature map, context profile, severity calibration, impact taxonomy, workflow ledger, integration map, and action inventory, this step is done. Output a one-line summary:
+When `$DEEP_REVIEW_DIR/architecture-map.md` is written and reflects the full feature map, context profile, severity calibration, impact taxonomy, workflow ledger, integration map, and action inventory, this step is done. Output a one-line summary:
 
 ```
-Mapped N features and M user actions across the codebase — ready for team-intent and deep scan.
+Mapped N features and M user actions across the codebase — ready for team-intent and action traces.
 ```
 
-The next step (`team-intent`) reads this file. The deep-scan and validation steps after it also depend on it. Quality here compounds.
+The next phase (`team-intent`) reads this file. The action-trace and validation phases after it also depend on it. Quality here compounds.

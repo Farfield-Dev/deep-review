@@ -1,4 +1,4 @@
-# Maintaining farfield-deep-scan
+# Maintaining deep-review
 
 The source of truth for the recipe is **Farfield's internal `find_bugs` recipe** at:
 
@@ -14,11 +14,33 @@ This public repo is a cleaned mirror of that, with Farfield-specific scaffolding
 - Issue-tracker integration (`issue-management` skill) → replaced with markdown `findings.md`
 - Codex CLI Jinja branches → resolved to Claude Code variant for v1
 
+## Repo shape
+
+This repo IS the skill directory. Cloning into `~/.claude/skills/deep-review/` makes the entire repo content (including `SKILL.md` at the root) the skill that Claude Code auto-discovers.
+
+```
+deep-review/                      (repo root = skill directory)
+├── SKILL.md                      Entry point, orchestrator, sub-agent prompts
+├── architecture-map.md           Phase 1 detail (loaded on demand)
+├── team-intent.md                Phase 2 detail (loaded on demand)
+├── action-trace.md               Phase 3 detail (loaded on demand)
+├── product-scan.md               Phase 4 detail (loaded on demand)
+├── adversarial-validate.md       Phase 5 detail (loaded on demand)
+├── README.md                     Repo-facing — not loaded by Claude Code
+├── LICENSE
+├── MAINTAINING.md                This file
+├── .gitignore
+└── examples/
+    └── findings-*.md             Example outputs from running on real OSS repos
+```
+
+`SKILL.md` is the only file with YAML frontmatter. The phase files are referenced from `SKILL.md` via standard markdown links, so Claude Code loads them on demand when each phase starts.
+
 ## Sync workflow
 
 For now this is **manual**. When Farfield's internal recipe meaningfully changes:
 
-1. Re-extract the relevant step file from the internal recipe
+1. Re-extract the relevant step file from the internal recipe (`apps/api/src/features/autopilot/recipe_files/find_bugs/steps/`)
 2. Apply the standard cuts (see list above)
 3. Open a PR here with the diff
 4. Tag it with the date the upstream change landed
@@ -31,15 +53,17 @@ The portable IP lives in five places. If you're updating the recipe, these are t
 
 | File | What lives here |
 |---|---|
-| `skills/architecture-map/SKILL.md` | Phase 0 signals, action inventory, workflow ledger, impact taxonomy, severity calibration |
-| `skills/team-intent/SKILL.md` | Bug-class mix taxonomy, anti-circularity (no SHAs / files in the brief), confidence cascade |
-| `skills/action-trace/SKILL.md` | The 7 trace questions, parallel sub-agent shape, cross-action synthesis |
-| `skills/product-scan/SKILL.md` | UX/product-level bug heuristics |
-| `skills/adversarial-validate/SKILL.md` | 100%-confidence rubric, scenario-specific mitigation check, disprove-vs-preserve balance |
+| `architecture-map.md` | Phase 0 signals, action inventory, workflow ledger, impact taxonomy, severity calibration |
+| `team-intent.md` | Bug-class mix taxonomy, anti-circularity (no SHAs / files in the brief), confidence cascade |
+| `action-trace.md` | The 7 trace questions, parallel sub-agent shape, cross-action synthesis |
+| `product-scan.md` | UX/product-level bug heuristics |
+| `adversarial-validate.md` | 100%-confidence rubric, scenario-specific mitigation check, disprove-vs-preserve balance |
+
+`SKILL.md` is the orchestrator and is structurally separate — it does not own methodology, only flow control and sub-agent prompt templates. Methodology changes should land in the phase files; orchestration changes (model choice per phase, modes, output schema) land in `SKILL.md`.
 
 ## What we deliberately do not port
 
-The Farfield-internal recipe has a `01_context_bootstrap.md` step that maintains a multi-run cache of company-context and per-repo structural maps, synced through the pod artifact endpoint. The OSS scan is single-run cold by design, so we collapse that step's useful methodology (clone discovery, company-context inference) into `architecture-map` as a prelude and drop the cache machinery.
+The Farfield-internal recipe has a `01_context_bootstrap.md` step that maintains a multi-run cache of company-context and per-repo structural maps, synced through the pod artifact endpoint. The OSS review is single-run cold by design, so we collapse that step's useful methodology (clone discovery, company-context inference) into `architecture-map.md` as a prelude and drop the cache machinery.
 
 If you find yourself porting any of the following from the internal recipe, **stop and reconsider** — they're scaffolding, not methodology:
 

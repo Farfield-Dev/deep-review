@@ -1,12 +1,36 @@
-# Farfield Deep Scan
+# Farfield Deep Review
 
-The bug-finding recipe we use in production at Farfield, packaged as a Claude Code skill so you can run it on your own repo.
+The bug-finding recipe Farfield uses in production, packaged as a Claude Code skill so you can run it on your own repo.
 
 > Farfield is a Slack-native quality agent for AI-heavy engineering teams. We use this exact recipe (plus team memory, production signals, scheduling, and Slack integration) to find and fix bugs before they become escalations. → [farfield.dev](https://farfield.dev)
 
+## Install
+
+```bash
+git clone https://github.com/Farfield-Dev/deep-review ~/.claude/skills/deep-review
+```
+
+That's it. Claude Code auto-discovers skills under `~/.claude/skills/`.
+
+## Run
+
+Inside Claude Code, in the root of the repo you want to review:
+
+```
+/deep-review
+```
+
+Or for the fast pass (skips team-intent and product-scan):
+
+```
+/deep-review --fast
+```
+
+The skill writes its working artifacts to `./.deep-review/` (add it to your `.gitignore`) and the final report to `./findings.md`.
+
 ## What it finds
 
-Deep Scan is opinionated. Every finding it reports has to map to one of seven impact categories or it gets dropped:
+Deep Review is opinionated. Every finding has to map to one of seven impact categories or it gets dropped:
 
 - **REVENUE_LEAK** — money lost, miscounted, double-charged, unbilled, refunded incorrectly
 - **SUPPORT_BURDEN** — produces support tickets users will actually file
@@ -22,58 +46,36 @@ Findings are validated adversarially before they make it into the report. Every 
 
 ## What it costs
 
-This is honest, because the HN comments will make it honest anyway.
+This is honest because the HN comments will make it honest anyway.
 
-A cold scan on a medium-sized repo (10–50k LOC, ~30 actions in the inventory) runs:
+A cold review on a medium-sized repo (10–50k LOC, ~30 actions in the inventory) runs:
 
 - **Architecture map + team intent**: Sonnet, ~$0.50–$2
 - **Action traces + product scan**: Opus, ~$4–$15
 - **Adversarial validation**: Opus, ~$1–$5
 
-Plan on **$5–$25 per scan** on your own Anthropic key. The orchestrator uses Sonnet for the cheap steps and Opus for the steps where it matters. If you want to cap costs, run `--fast` (skips team-intent and product-scan).
-
-## Install
-
-```bash
-git clone https://github.com/Farfield-Dev/deep-scan ~/.claude/skills/farfield-deep-scan
-```
-
-That's it. Claude Code auto-discovers skills under `~/.claude/skills/`.
-
-## Run
-
-Inside Claude Code, in the root of the repo you want to scan:
-
-```
-/deep-scan
-```
-
-Or for the fast pass:
-
-```
-/deep-scan --fast
-```
-
-The skill writes its working artifacts to `./.deep-scan/` (gitignored by default) and the final report to `./findings.md`.
+Plan on **$5–$25 per review** on your own Anthropic key. The orchestrator uses Sonnet for the cheap phases and Opus for the phases where it matters. If you want to cap costs, run `--fast` (skips team-intent and product-scan).
 
 ## What's in the box
 
-Six skills, run as a pipeline:
+One skill (this directory), one entry point (`SKILL.md`), five phase reference files loaded on demand:
 
-| Step | Skill | What it does |
+| File | Phase | What it does |
 |---|---|---|
-| Orchestrator | `deep-scan` | Routes the pipeline |
-| 1 | `architecture-map` | Phase 0 signals (git, deps, linter, runtime grep), feature map, action inventory, workflow ledger, integration map |
-| 2 | `team-intent` | Class-level brief from 2mo of commits — bug-class mix, mode, confidence, trust-critical surfaces |
-| 3 | `action-trace` | Trace every user action end-to-end through the system, in parallel sub-agents |
-| 4 | `product-scan` | UX/product-level bugs (parallel pass) |
-| 5 | `adversarial-validate` | 100%-confidence validation rubric, writes `findings.md` |
+| `SKILL.md` | Orchestrator | Routes the pipeline, embeds sub-agent prompts, defines the output schema |
+| `architecture-map.md` | 1 | Phase 0 signals (git, deps, linter, runtime grep), feature map, action inventory, workflow ledger, integration map, impact taxonomy, severity calibration |
+| `team-intent.md` | 2 | Class-level brief from 2 months of commits — bug-class mix, mode, confidence, trust-critical surfaces |
+| `action-trace.md` | 3 | Trace every user action end-to-end in parallel sub-agents. **The primary bug-finding phase.** |
+| `product-scan.md` | 4 | UX/product-level bugs (parallel pass) |
+| `adversarial-validate.md` | 5 | 100%-confidence validation rubric, writes `findings.md` |
+
+> **🚧 Status (day 0)**: phases 1 and 2 are extracted and ready. Phases 3, 4, and 5 are landing this week. The orchestrator SKILL.md and architecture are stable.
 
 ## What this is *not*
 
-Deep Scan is the same recipe Farfield runs in production. But this OSS version intentionally ships **without** the things that make Farfield's paid product compounding:
+Deep Review is the same recipe Farfield runs in production. But this OSS version intentionally ships **without** the things that make Farfield's paid product compounding:
 
-- ❌ No team memory across runs (every scan is cold)
+- ❌ No team memory across runs (every review is cold)
 - ❌ No production signal integration (no Sentry, no log correlation)
 - ❌ No Slack context (no thread history, no team-conversation grounding)
 - ❌ No scheduled cadence (you trigger it manually)
@@ -81,7 +83,7 @@ Deep Scan is the same recipe Farfield runs in production. But this OSS version i
 - ❌ No dedup against existing issues (every run reports all findings fresh)
 - ❌ No issue tracker integration (output is a markdown file)
 
-If you want any of those, that's [Farfield](https://farfield.dev). The OSS scan is the floor of what the methodology can do; Farfield is what happens when you layer memory, production signals, and Slack-native investigation on top.
+If you want any of those, that's [Farfield](https://farfield.dev). The OSS review is the floor of what the methodology can do; Farfield is what happens when you layer memory, production signals, and Slack-native investigation on top.
 
 ## How this compares
 
@@ -91,13 +93,13 @@ If you want any of those, that's [Farfield](https://farfield.dev). The OSS scan 
 | Sourcery / DeepSource | Style + types | Medium | No | No | No |
 | CodeRabbit | Diff-scoped | Medium | Workspace-level | No | Notifications only |
 | Greptile | Full-repo context | Medium-high | Workspace-level | No | Notifications only |
-| **Farfield Deep Scan (OSS)** | Action-trace + workflow | High (adversarial validation) | No | No | No |
+| **Farfield Deep Review (OSS)** | Action-trace + workflow | High (adversarial validation) | No | No | No |
 | **Farfield (paid)** | Same recipe | Same | Yes | Yes (Sentry / logs) | Yes |
 
 ## Limitations
 
-- **First scan is cold and expensive.** Subsequent runs in the same checkout reuse `./.deep-scan/` artifacts where possible, but there's no cross-repo or cross-team memory in the OSS version.
-- **Best on backends with real workflows.** The recipe is action-centric. Pure static-site or design-system repos won't surface much. The deeper the runtime topology (queues, caches, transactions, retries, multi-tenant boundaries), the better the scan.
+- **First review is cold and expensive.** Subsequent runs in the same checkout reuse `./.deep-review/` artifacts where possible, but there's no cross-repo or cross-team memory in the OSS version.
+- **Best on backends with real workflows.** The recipe is action-centric. Pure static-site or design-system repos won't surface much. The deeper the runtime topology (queues, caches, transactions, retries, multi-tenant boundaries), the better the review.
 - **Findings are opinionated, not exhaustive.** We'd rather ship 3 ironclad findings than 30 maybe-bugs. Other tools optimize the other way.
 
 ## Maintaining
