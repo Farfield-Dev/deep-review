@@ -9,7 +9,10 @@ Inside Claude Code:
 ```
 /plugin marketplace add Farfield-Dev/deep-review
 /plugin install deep-review@deep-review
+/reload-plugins
 ```
+
+(`/reload-plugins` registers the freshly installed skill in the current session. Skip it and `/deep-review:run` errors with "Unknown command".)
 
 Auto-updates from this repo's `main`.
 
