@@ -16,26 +16,36 @@ This public repo is a cleaned mirror of that, with Farfield-specific scaffolding
 
 ## Repo shape
 
-This repo IS the skill directory. Cloning into `~/.claude/skills/deep-review/` makes the entire repo content (including `SKILL.md` at the root) the skill that Claude Code auto-discovers.
+This repo is a Claude Code **plugin marketplace** that ships a single plugin (`deep-review`) containing a single skill (`run`).
 
 ```
-deep-review/                      (repo root = skill directory)
-├── SKILL.md                      Entry point, orchestrator, sub-agent prompts
-├── phases/                       Phase methodology, loaded on demand from SKILL.md
-│   ├── architecture-map.md       Phase 1
-│   ├── team-intent.md            Phase 2
-│   ├── action-trace.md           Phase 3
-│   ├── product-scan.md           Phase 4
-│   └── adversarial-validate.md   Phase 5
-├── README.md                     Repo-facing — not loaded by Claude Code
+deep-review/                                       (repo root = marketplace root)
+├── .claude-plugin/
+│   └── marketplace.json                           Marketplace catalog (lists plugins)
+├── plugins/
+│   └── deep-review/                               The plugin
+│       ├── .claude-plugin/
+│       │   └── plugin.json                        Plugin manifest
+│       └── skills/
+│           └── run/                               The skill — invoked as /deep-review:run
+│               ├── SKILL.md                       Entry point, orchestrator
+│               └── phases/                        Phase methodology, loaded on demand
+│                   ├── architecture-map.md        Phase 1
+│                   ├── team-intent.md             Phase 2
+│                   ├── action-trace.md            Phase 3
+│                   ├── product-scan.md            Phase 4
+│                   └── adversarial-validate.md    Phase 5
+├── README.md                                      Repo-facing (not loaded by Claude Code)
 ├── LICENSE
-├── MAINTAINING.md                This file
+├── MAINTAINING.md                                 This file
 ├── .gitignore
 └── examples/
-    └── findings-*.md             Example outputs from running on real OSS repos
+    └── findings-*.md                              Example outputs from running on real OSS repos
 ```
 
 `SKILL.md` is the only file with YAML frontmatter. The `phases/*.md` files are referenced from `SKILL.md` via standard markdown links, so Claude Code loads them on demand when each phase starts.
+
+The marketplace + plugin manifests in `.claude-plugin/*.json` are what make `/plugin marketplace add Farfield-Dev/deep-review` + `/plugin install deep-review@deep-review` work as the canonical install path.
 
 ## Sync workflow
 
@@ -45,6 +55,7 @@ For now this is **manual**. When Farfield's internal recipe meaningfully changes
 2. Apply the standard cuts (see list above)
 3. Open a PR here with the diff
 4. Tag it with the date the upstream change landed
+5. Bump `version` in `plugins/deep-review/.claude-plugin/plugin.json` so installed users get the update on their next `/plugin marketplace update`
 
 A future automation will open these PRs automatically when `recipe_files/find_bugs/` changes on Farfield's default branch, but that's not built yet.
 
@@ -54,11 +65,11 @@ The portable IP lives in five places. If you're updating the recipe, these are t
 
 | File | What lives here |
 |---|---|
-| `phases/architecture-map.md` | Phase 0 signals, action inventory, workflow ledger, impact taxonomy, severity calibration |
-| `phases/team-intent.md` | Bug-class mix taxonomy, anti-circularity (no SHAs / files in the brief), confidence cascade |
-| `phases/action-trace.md` | The 7 trace questions, parallel sub-agent shape, cross-action synthesis |
-| `phases/product-scan.md` | UX/product-level bug heuristics |
-| `phases/adversarial-validate.md` | 100%-confidence rubric, scenario-specific mitigation check, disprove-vs-preserve balance |
+| `plugins/deep-review/skills/run/phases/architecture-map.md` | Phase 0 signals, action inventory, workflow ledger, impact taxonomy, severity calibration |
+| `plugins/deep-review/skills/run/phases/team-intent.md` | Bug-class mix taxonomy, anti-circularity (no SHAs / files in the brief), confidence cascade |
+| `plugins/deep-review/skills/run/phases/action-trace.md` | The 7 trace questions, parallel sub-agent shape, cross-action synthesis |
+| `plugins/deep-review/skills/run/phases/product-scan.md` | UX/product-level bug heuristics |
+| `plugins/deep-review/skills/run/phases/adversarial-validate.md` | 100%-confidence rubric, scenario-specific mitigation check, disprove-vs-preserve balance |
 
 `SKILL.md` is the orchestrator and is structurally separate — it does not own methodology, only flow control and sub-agent prompt templates. Methodology changes should land in the phase files; orchestration changes (model choice per phase, modes, output schema) land in `SKILL.md`.
 
@@ -72,6 +83,17 @@ If you find yourself porting any of the following from the internal recipe, **st
 - Anything that reads or writes `repos.json`
 - Anything keyed by `repository_public_id`
 - Anything that emits the `<!-- farfield-meta -->` HTML metadata block
+
+## Submitting to the community marketplace
+
+To make this installable in one command (`/plugin install deep-review@claude-community`) without users needing to add the marketplace first:
+
+1. Run `claude plugin validate` locally to confirm the manifests are clean
+2. Submit at [platform.claude.com/plugins/submit](https://platform.claude.com/plugins/submit)
+3. Automated review (24–48h)
+4. After approval, the community catalog auto-pins to a commit SHA and CI bumps the pin as we push new commits
+
+This is independent of our own marketplace — both paths can coexist.
 
 ## Reporting issues
 

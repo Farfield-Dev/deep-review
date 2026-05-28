@@ -1,32 +1,39 @@
 # Farfield Deep Review
 
-The bug-finding recipe Farfield uses in production, packaged as a Claude Code skill so you can run it on your own repo.
+The bug-finding recipe Farfield uses in production, packaged as a Claude Code plugin so you can run it on your own repo.
 
 > Farfield is a Slack-native quality agent for AI-heavy engineering teams. We use this exact recipe (plus team memory, production signals, scheduling, and Slack integration) to find and fix bugs before they become escalations. → [farfield.dev](https://farfield.dev)
 
 ## Install
 
-```bash
-git clone https://github.com/Farfield-Dev/deep-review ~/.claude/skills/deep-review
+Inside Claude Code:
+
+```
+/plugin marketplace add Farfield-Dev/deep-review
+/plugin install deep-review@deep-review
 ```
 
-That's it. Claude Code auto-discovers skills under `~/.claude/skills/`.
+That's it. Two slash commands. The plugin auto-updates from this repo's `main` branch.
+
+If you prefer the raw skill (no plugin manager), see [Alternative install](#alternative-install-raw-skill) below.
 
 ## Run
 
-Inside Claude Code, in the root of the repo you want to review:
+In Claude Code, in the root of the repo you want to review:
 
 ```
-/deep-review
+/deep-review:run
 ```
 
 Or for the fast pass (skips team-intent and product-scan):
 
 ```
-/deep-review --fast
+/deep-review:run --fast
 ```
 
-The skill writes its working artifacts to `./.deep-review/` (add it to your `.gitignore`) and the final report to `./findings.md`.
+You can also just say "deep review this repo" — the plugin's description triggers on natural language too.
+
+The plugin writes intermediate artifacts to `./.deep-review/` (add it to your `.gitignore`) and the final report to `./findings.md`.
 
 ## What it finds
 
@@ -58,11 +65,11 @@ Plan on **$5–$25 per review** on your own Anthropic key. The orchestrator uses
 
 ## What's in the box
 
-One skill (this directory), one entry point (`SKILL.md`), five phase reference files loaded on demand:
+One plugin, one skill, five phase reference files loaded on demand:
 
 | File | Phase | What it does |
 |---|---|---|
-| `SKILL.md` | Orchestrator | Routes the pipeline, embeds sub-agent prompts, defines the output schema |
+| `plugins/deep-review/skills/run/SKILL.md` | Orchestrator | Routes the pipeline, embeds sub-agent prompts, defines the output schema |
 | `phases/architecture-map.md` | 1 | Phase 0 signals (git, deps, linter, runtime grep), feature map, action inventory, workflow ledger, integration map, impact taxonomy, severity calibration |
 | `phases/team-intent.md` | 2 | Class-level brief from 2 months of commits — bug-class mix, mode, confidence, trust-critical surfaces |
 | `phases/action-trace.md` | 3 | Trace every user action end-to-end in parallel sub-agents. **The primary bug-finding phase.** |
@@ -99,6 +106,19 @@ If you want any of those, that's [Farfield](https://farfield.dev). The OSS revie
 - **First review is cold and expensive.** Subsequent runs in the same checkout reuse `./.deep-review/` artifacts where possible, but there's no cross-repo or cross-team memory in the OSS version.
 - **Best on backends with real workflows.** The recipe is action-centric. Pure static-site or design-system repos won't surface much. The deeper the runtime topology (queues, caches, transactions, retries, multi-tenant boundaries), the better the review.
 - **Findings are opinionated, not exhaustive.** We'd rather ship 3 ironclad findings than 30 maybe-bugs. Other tools optimize the other way.
+
+## Alternative install (raw skill)
+
+If you'd rather skip the plugin manager and install as a standalone skill:
+
+```bash
+git clone https://github.com/Farfield-Dev/deep-review /tmp/deep-review
+cp -r /tmp/deep-review/plugins/deep-review/skills/run ~/.claude/skills/deep-review
+```
+
+Then in Claude Code: `/deep-review` (no `:run` suffix in this case, since standalone skills aren't namespaced).
+
+You lose plugin auto-updates and discoverability via `/plugin`, but you get the same skill content.
 
 ## Maintaining
 

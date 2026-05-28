@@ -1,0 +1,18 @@
+{
+  "$schema": "https://code.claude.com/schemas/marketplace.json",
+  "name": "deep-review",
+  "description": "The bug-finding recipe Farfield uses in production, packaged for Claude Code.",
+  "owner": {
+    "name": "Farfield",
+    "email": "hi@farfield.dev"
+  },
+  "plugins": [
+    {
+      "name": "deep-review",
+      "source": "./plugins/deep-review",
+      "description": "Senior-engineer-grade code review that traces every user action end-to-end through the system. Five-phase pipeline (architecture map, team intent, action trace, product scan, adversarial validation). Produces findings.md with severity + impact-category mapping.",
+      "category": "code-quality",
+      "tags": ["code-review", "bug-finding", "static-analysis", "quality", "audit"]
+    }
+  ]
+}

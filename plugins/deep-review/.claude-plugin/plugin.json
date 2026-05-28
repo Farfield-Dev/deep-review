@@ -1,0 +1,15 @@
+{
+  "$schema": "https://code.claude.com/schemas/plugin.json",
+  "name": "deep-review",
+  "description": "Senior-engineer-grade code review that traces every user action end-to-end through the system to surface real, production-relevant bugs. The recipe Farfield uses in production.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Farfield",
+    "email": "hi@farfield.dev",
+    "url": "https://farfield.dev"
+  },
+  "homepage": "https://github.com/Farfield-Dev/deep-review",
+  "repository": "https://github.com/Farfield-Dev/deep-review",
+  "license": "MIT",
+  "keywords": ["code-review", "bug-finding", "static-analysis", "quality", "audit", "farfield"]
+}

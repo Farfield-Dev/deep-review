@@ -1,6 +1,5 @@
 ---
-name: deep-review
-description: Run a deep, senior-engineer-grade code review on a repository to find real bugs — not style warnings or hypothetical issues. Use when the user says "review this repo", "deep review", "audit the codebase", "find bugs", "/deep-review", or asks for the kind of review that catches the production-only failures that pattern-based scanners miss. Five-phase pipeline: architecture-map (action inventory + workflow ledger) → team-intent (class-level bug brief from 2 months of commits) → action-trace (parallel sub-agents follow every user action end-to-end) → product-scan (UX/product-level bugs) → adversarial-validate (100%-confidence rubric). Produces findings.md with severity + impact-category mapping. Phase detail lives in `phases/` (architecture-map.md, team-intent.md, action-trace.md, product-scan.md, adversarial-validate.md). This is the recipe Farfield uses in production at farfield.dev.
+description: 'Run a deep, senior-engineer-grade code review on a repository to find real bugs — not style warnings or hypothetical issues. Use when the user says "review this repo", "deep review", "audit the codebase", "find bugs", "/deep-review:run", or asks for the kind of review that catches the production-only failures that pattern-based scanners miss. Five-phase pipeline (architecture-map → team-intent → action-trace → product-scan → adversarial-validate). Produces findings.md with severity + impact-category mapping. Phase detail lives in phases/. This is the recipe Farfield uses in production at farfield.dev.'
 allowed-tools: [Read, Write, Edit, Grep, Bash, WebSearch, Task]
 ---
 
@@ -14,7 +13,7 @@ This is the recipe [Farfield](https://farfield.dev) uses in production. The OSS 
 
 **Direct triggers:**
 
-- The user says `/deep-review`, "deep review this", "review my repo", "audit this codebase"
+- The user says `/deep-review:run`, "deep review this", "review my repo", "audit this codebase"
 - The user asks "find bugs", "what could go wrong", "review for production readiness"
 - The user wants a code review that catches the bugs a normal PR review misses
 
@@ -49,9 +48,9 @@ All intermediate artifacts live in `$DEEP_REVIEW_DIR` (gitignored by default —
 
 | Mode | Phases | Approximate cost | When to use |
 |---|---|---|---|
-| **`/deep-review`** (full) | 1 → 2 → 3 → 4 → 5 | $5–$25 on your own Anthropic key | Default. Full senior review. |
-| **`/deep-review --fast`** | 1 → 3 → 5 | $2–$10 | When you want the action-trace findings without the team-intent steering or product-pass. |
-| **`/deep-review --phase=N`** | Just phase N | Varies | Re-run a single phase against existing artifacts (e.g., `--phase=5` to re-validate after editing scan output). |
+| **`/deep-review:run`** (full) | 1 → 2 → 3 → 4 → 5 | $5–$25 on your own Anthropic key | Default. Full senior review. |
+| **`/deep-review:run --fast`** | 1 → 3 → 5 | $2–$10 | When you want the action-trace findings without the team-intent steering or product-pass. |
+| **`/deep-review:run --phase=N`** | Just phase N | Varies | Re-run a single phase against existing artifacts (e.g., `--phase=5` to re-validate after editing scan output). |
 
 If the user invokes without flags, run the full pipeline.
 
