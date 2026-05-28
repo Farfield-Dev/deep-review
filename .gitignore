@@ -1,0 +1,14 @@
+# The scan's working directory, written into the user's repo when they run /deep-scan.
+# Nothing in here is intended to be checked in.
+.deep-scan/
+
+# Editor + OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Node (if anyone adds tooling later)
+node_modules/
+.npm/
