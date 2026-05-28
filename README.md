@@ -35,7 +35,7 @@ Plan on **$5–$25 per scan** on your own Anthropic key. The orchestrator uses S
 ## Install
 
 ```bash
-git clone https://github.com/farfield/deep-scan ~/.claude/skills/farfield-deep-scan
+git clone https://github.com/Farfield-Dev/deep-scan ~/.claude/skills/farfield-deep-scan
 ```
 
 That's it. Claude Code auto-discovers skills under `~/.claude/skills/`.
